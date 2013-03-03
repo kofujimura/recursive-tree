@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Recursive Tree</title>
+    <link rel="stylesheet" href="demo.css" type="text/css" media="screen">
+    <script src="raphael-min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="animate01.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+// SVG Recursive Tree using raphael.js
+// written by Ko Fujimura (www.fujimura.com)
+// 2012.12.24
+
+window.onload = function () {
+
+var paper = Raphael("holder", 800, 600);
+					
+// Definition of branch shapes.
+var BRANCH_LENGTH = 100;
+Raphael.fn.branch = function (x, y, scale, rotate) {
+	return this.path(
+"M-7.3-21.2c0.6-8.9,1.7-56.7,1.3-79.4c-0.3-21.6-0.6-86.3,0.6-95.8c1.1-9.2,13.2-8,13.2-0.4c0,12.4-1.1,57.3-2.2,72.1c-1.1,15-0.1,53.5,0.6,61.2C7-56.5,7.1-29.5,8.1-20.2c0.7,7.2,4,17.1,1.8,22.6C7.7,7.8-5.7,8-9,4C-13.2-1.1-8.1-8.8-7.3-21.2z").attr({fill:"#181b12", stroke:"#ffffff", 'stroke-width':0.1}).transform("t" + x +"," + y).scale(scale,scale,0,0).rotate(rotate,0,0);
+}
+
+// Definition of leaf shapes.
+var leaf_style = ["#4e724c","#9eb296","#5e7153","#142a1e","#2f563b","#244f33"];
+
+Raphael.fn.leaf = function (x, y, scale, rotate) {
+	return this.path("M-4.6-3.7C-8.2-6.2-23-16-23.8-25.2s1.2-15.1,11.1-27.6s8.1-27.8,8.1-27.8s3.1,17.3,13.2,27.8c7.7,8.1,21.2,18.7,17.6,26C21.8-17.9,16-18.3,6.4-7.3C-0.7,0.9,1,5.5,1,5.5S-0.9-1.1-4.6-3.7z").attr({fill:leaf_style[Math.floor(Math.random()*6)], stroke:"#ffffff",'stroke-width':0.1}).transform("t" + x +"," + y).scale(scale,scale,0,0).rotate(rotate,0,0);
+}
+
+function tree(x,y,scale,rotate,depth) {
+	if (scale < 0.02 || depth > 10) {
+		paper.leaf(x, y, scale, Math.floor(180*Math.random()));
+		paper.leaf(x, y, scale, Math.floor(180*Math.random()));
+		return 0;
+	} else {
+		var scale1 = 1 - Math.exp(-0.02 * Math.min(y-1.5*x+500,y+1.5*x-700));
+		if (s1<0) s1=0;
+		scale = scale * scale1;
+		var s1 = scale * (0.5 + 0.6 * Math.random()); // Growth ratio of right branch 
+		var s2 = scale * (0.5 + 0.6 * Math.random()); // Growth ratio of left branch
+		var r1 = rotate + Math.random()*30 + depth; // Rotation of right branch
+		var r2 = rotate - Math.random()*30 - depth; // Rotation of left branch	
+		var x1 = x + s1 * BRANCH_LENGTH * Math.sin(r1 * Math.PI / 180.0);
+		var y1 = y - s1 * BRANCH_LENGTH * Math.cos(r1 * Math.PI / 180.0);
+		var x2 = x + s2 * BRANCH_LENGTH * Math.sin(r2 * Math.PI / 180.0);
+		var y2 = y - s2 * BRANCH_LENGTH * Math.cos(r2 * Math.PI / 180.0);
+		depth++;
+		paper.branch(x, y, 0.5*s1, r1).animate({opacity:1.0},0,function () {tree(x1, y1, s1, r1, depth);});
+		// Next level of right branch
+		paper.branch(x, y, 0.5*s2, r2).animate({opacity:1.0},0,function () {tree(x2, y2, s2, r2, depth);});
+		// Next level of left branch
+	}
+}
+
+paper.rect(0.0, 0.0, 800, 600).attr({fill:"90-#ffcccc:10-#88bbbb:60",stroke:"ffffff",'stroke-width':0.5});
+paper.rect(0.0, 500, 800, 100).attr({fill:"90-#222222:10-#43545b:60",stroke:"ffffff",'stroke-width':0.5});
+
+paper.branch(400,500,0.25,0);
+tree(400, 450, 0.5, 0, 0); 
+
+}
+</script>
+
+</head>
+<body>
+    <div id="holder"></div>
+</body>
+</html>
